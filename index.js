@@ -1,57 +1,51 @@
-//window.onload = function () {alert('loaded'};
+$(function() {
+  var $tvShowsContainer = $('#app-body').find('.tv-shows');
 
-$(document).ready(function() {
+  function renderShows(shows) {
+    $tvShowsContainer.find('.loader').remove();
+    shows.forEach(function (show) {
+      var article = template
+        .replace(':name:', show.name)
+        .replace(':img:', show.image.medium)
+        .replace(':summary:', show.summary)
+        .replace(':img alt:', show.name + " Logo")
 
+      var $article = $(article)
+      $article.hide();
+      $tvShowsContainer.append($article.show());
+    })
+  }
 
-  //CUANDO QUIERO SER MUY ESPECIFICO
-  //PRIMERO HAY QUE PONER EN EL HTML data-title="tvify"
-  //$('header[data-title="tvify"]');
+  /**
+   * Submit serach form
+   */
 
-  //$('#app-header').find('h1');
-  //$('#app-header').has('.title');
-  //$('#app-header').not('.title');
-  //filtra todas las p que tenga la clase p
-  //<p class="text"></p>
-  //$('p').filter('.text');
-  //$('p').eq(1);
+  $('#app-body')
+    .find('form')
+    .submit(function (ev) {
+      ev.preventDefault();
+      var busqueda = $(this)
+        .find('input[type="text"]')
+        .val();
 
-  //Esto es un objeto :)
-  /*var a = $('<a>', {
-    href: 'http://platzi.com',
-    target: '_blank',
-    html: 'Ir a platzi'
-  }*/
-  //agrega atributos al html
-//  $('#app-body').append(a);
-  //getter solo se pasa un atributo el que uno quiera ver
-  //setter se pasan dos parametros, el atributo y el contenido
-  //a.attr('href','http://google.com')
-  //Agregar una clase
-  //$('h1').addClass('danger');
-  //Quita una clase
-  //$('h1').removeClass('danger');
+      $tvShowsContainer.find('.tv-show').remove()
+      var $loader = $('<div class="loader">');
+      $loader.appendTo($tvShowsContainer);
+      $.ajax({
+        url: 'http://api.tvmaze.com/search/shows',
+        data: { q: busqueda },
+        success: function (res, textStatus, xhr) {
+          $loader.remove();
+          var shows = res.map(function (el) {
+            return el.show;
+          })
 
-  //funcion para apartir de un tiempo agrege cosas
-/*  setTimeout(function(){
-    $('h1').addClass('danger');
-  },1500)*/
+          renderShows(shows);
+        }
+      })
+    })
 
-//Modifica el css principal
-  /*$('h1').css({
-    'font-size':'70px'
-  })*/
-
-
-/**
-*Submit search-form
-*/
-$('#app-body').find('form').submit(function(ev) {
-  ev.preventDefault();
-  var busqueda = $(this).find('input[type="text"]').val();
-  alert('Se a buscado: ' + busqueda);
-});
-
-var template = '<article class="tv-show">' +
+  var template = '<article class="tv-show">' +
           '<div class="left img-container">' +
             '<img src=":img:" alt=":img alt:">' +
           '</div>' +
@@ -61,20 +55,15 @@ var template = '<article class="tv-show">' +
           '</div>' +
         '</article>';
 
-$.ajax({
-  url: 'http://api.tvmaze.com/shows',
-  success: function (shows,textStatus,xhr) {
-    var $tvShowsContainer = $('#app-body').find('.tv-shows');
-    shows.forEach(function(show){
-      var article = template.replace(':name:',show.name).replace(':img:',show.image.medium).replace(':summary:',show.summary).replace(':img alt:',show.name + " Logo")
-
-      $tvShowsContainer.append($(article));
-    })
+  if (!localStorage.shows) {
+    $.ajax('http://api.tvmaze.com/shows')
+      .then(function (shows) {
+        $tvShowsContainer.find('.loader').remove();
+        localStorage.shows = JSON.stringify(shows);
+        renderShows(shows);
+      })
+  } else {
+    renderShows(JSON.parse(localStorage.shows));
   }
-});
-
-
-
-
 
 })
