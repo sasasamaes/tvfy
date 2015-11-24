@@ -21,6 +21,10 @@ body {
   line-height: 10vh;
   margin: 0;
   color: white;
+  display: inline;
+}
+#app-header a{
+  text-decoration: none;
 }
 
 #app-header h1.danger {
@@ -88,9 +92,20 @@ body {
 }
 
 #app-body .search-form input[type="text"] {
-  padding: 12px 16px;
+  margin: 0 auto;
+  padding: 12px 6px;
   border-radius: 6px;
   width: 300px;
+}
+
+#app-body .search-form button[type="submit"] {
+  border-radius: 6px;
+  border-color: #2ecc71;
+  color: white;
+  width: 70px;
+  height: 6vh;
+
+  background-color: #2ecc71;
 }
 
 .loader {
@@ -116,7 +131,7 @@ body {
 .loader:before {
   width: 50%;
   height: 50%;
-  background: #ffffff;
+  background: #bdc3c7;
   border-radius: 100% 0 0 0;
   position: absolute;
   top: 0;
@@ -124,7 +139,7 @@ body {
   content: '';
 }
 .loader:after {
-  background: #0dc5c1;
+  background: #bdc3c7;
   width: 75%;
   height: 75%;
   border-radius: 50%;
